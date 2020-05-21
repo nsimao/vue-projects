@@ -31,11 +31,11 @@ new Vue({
             if (!this.gameIsRunning)
             {
                 this.reset();
-                this.logs.push(this.getLog(true, 'game started'));
+                this.createLog(true, 'game started');
                 this.gameIsRunning= true;
             }
             else
-                this.logs.push(this.getLog(true, 'game already started!'));
+                this.createLog(true, 'game already started!');
 
         },
         attack: function() {
@@ -47,13 +47,18 @@ new Vue({
         heal: function() {
             if (!this.gameIsRunning)
                 return;
-
+			
+			if (this.monsterHealth <= 0) {
+                this.createLog(false, 'no need hero, monster is already dead!');
+				return;				
+			}
+			
             this.playerHealth += 10;
             this.playerHealth -= 2;
             if (this.playerHealth > 100)
                 this.playerHealth = 100;
 
-            this.logs.push(this.getLog(true, 'player heal'));                
+            this.createLog(true, 'player heal');
         },
         giveUp: function() {
             this.reset();
@@ -74,22 +79,22 @@ new Vue({
                     else
                         this.playerHealth = 0;                         
                     
-                    this.logs.push(this.getLog(true, 'player - ' + playerDamage)); 
-                    this.logs.push(this.getLog(false, 'monster - ' + monsterDamage)); 
+                    this.createLog(true, 'player - ' + playerDamage); 
+                    this.createLog(false, 'monster - ' + monsterDamage); 
                 }
                 
                 if (this.monsterHealth <= 0)
-                    this.logs.push(this.getLog(false, 'calm down hero, monster is already dead!'));                        
+                    this.createLog(false, 'calm down hero, monster is already dead!');                        
 
                 if (this.playerHealth <= 0)
-                    this.logs.push(this.getLog(true, 'greate hero! what is dead may never die!'));
+                    this.createLog(true, 'greate hero! what is dead may never die!');
             }
             else
-                this.logs.push(this.getLog(true, 'start the game first'));                 
+                this.createLog(true, 'start the game first');
         },
-        getLog: function(isPlayer, message)
+        createLog: function(isPlayer, message)
         {
-            return {isPlayer, message};
+            this.logs.unshift({isPlayer, message});
         },
         calculateDamage: function(min, max) {
             return Math.max(Math.floor(Math.random() * max) + 1, min);
